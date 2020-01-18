@@ -9,19 +9,23 @@ class StopWatch extends React.Component {
     super(...arguments);
     this.state = {
       isStarted: false,
+      firstTime: null,
       startTime: null,
       currentTime: null,
-      splits: []
+      isPause: false,
+      splits: [],
+      diffTime:0
     }
   }
 
   onStart = () => {
     this.setState({
       isStarted: true,
+      isPause: false,
       startTime: new Date(),
       currentTime: new Date()
     });
-
+ 
     this.intervalHandle = setInterval(() => {
       this.setState({currentTime: new Date()});
     }, 1000 / 60);
@@ -29,8 +33,13 @@ class StopWatch extends React.Component {
 
   onPause = () => {
     clearInterval(this.intervalHandle);
+    this.diffTime = this.state.currentTime - this.state.startTime;
+    this.diffTime = this.diffTime ? this.diffTime : 0
     this.setState({
-      isStarted: false
+      isStarted: false,
+      startTime: new Date(),
+      currentTime: new Date(),
+      diffTime: this.state.diffTime + this.diffTime
     })
   }
 
@@ -38,20 +47,22 @@ class StopWatch extends React.Component {
     this.setState({
       startTime: null,
       currentTime: null,
-      splits: []
+      splits: [],
+      diffTime: 0
     })
   }
 
   onSplit = () => {
     this.setState({
-      splits: [...this.state.splits, this.state.currentTime - this.state.startTime]
+      splits: [...this.state.splits, this.state.currentTime - this.state.startTime + this.state.diffTime]
     })
   }
 
   render() {
+    console.log(this.state.diffTime);
     return (
       <Fragment>
-        <MajorClock milliseconds={this.state.currentTime - this.state.startTime}/>
+        <MajorClock milliseconds={this.state.currentTime - this.state.startTime + this.state.diffTime}/>
         <ControlButtons 
           activated={this.state.isStarted}
           onStart={this.onStart}
